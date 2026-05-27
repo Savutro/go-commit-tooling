@@ -143,9 +143,9 @@ Writes a plain semantic `VERSION` file.
 
 The file is intentionally boring so pipelines, Docker builds, Go release jobs, and static site deployments can read it without app-specific parsing.
 
-## Are `generate` And `version` Obsolete?
+## What about the commands `generate` and `version`?
 
-They are no longer the happy path for normal releases. `gct release` is better because it updates `VERSION`, regenerates `CHANGELOG.md`, commits both together, and creates the tag in one flow.
+They are no longer the path for normal releases. `gct release` is better because it updates `VERSION`, regenerates `CHANGELOG.md`, commits both together, and creates the tag in one flow.
 
 They are still useful as lower-level commands:
 
