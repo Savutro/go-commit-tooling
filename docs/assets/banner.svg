@@ -1,0 +1,13 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="360" fill="#0B1020"/>
+  <rect x="64" y="58" width="1072" height="244" rx="24" fill="#111A2E" stroke="#2D7FF9" stroke-width="2"/>
+  <path d="M104 112H420" stroke="#2D7FF9" stroke-width="10" stroke-linecap="round"/>
+  <path d="M104 152H332" stroke="#14B8A6" stroke-width="10" stroke-linecap="round"/>
+  <path d="M104 192H380" stroke="#F59E0B" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="934" cy="150" r="54" fill="#2D7FF9"/>
+  <circle cx="1012" cy="210" r="54" fill="#14B8A6"/>
+  <circle cx="856" cy="210" r="54" fill="#F59E0B"/>
+  <path d="M856 210L934 150L1012 210" stroke="#E5E7EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="104" y="267" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="54" font-weight="700">go-commit-tooling</text>
+  <text x="104" y="310" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="24">Interactive Git staging, Conventional Commits, changelogs, and release tags.</text>
+</svg>
