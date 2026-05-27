@@ -109,9 +109,10 @@ const (
 func Prompt(in io.Reader, out io.Writer, current Semver, suggested BumpKind) (Semver, error) {
 	kind := string(suggested)
 	custom := ""
+	formInput := accessibleInput(in)
 
 	form := tui.Form(
-		in,
+		formInput,
 		out,
 		huh.NewGroup(
 			huh.NewSelect[string]().
@@ -125,21 +126,6 @@ func Prompt(in io.Reader, out io.Writer, current Semver, suggested BumpKind) (Se
 				).
 				Value(&kind).
 				Height(7),
-			huh.NewInput().
-				Title("Custom version").
-				Description("Only used when custom was selected. Leave blank otherwise.").
-				Placeholder("1.2.3").
-				Validate(func(value string) error {
-					if kind != "custom" {
-						return nil
-					}
-					if strings.TrimSpace(value) == "" {
-						return errors.New("custom version is required")
-					}
-					_, err := Parse(value)
-					return err
-				}).
-				Value(&custom),
 		),
 	)
 
@@ -151,12 +137,63 @@ func Prompt(in io.Reader, out io.Writer, current Semver, suggested BumpKind) (Se
 	}
 
 	next := current.Bump(kind)
-	if kind == "custom" {
-		parsed, err := Parse(custom)
-		if err != nil {
-			return Semver{}, err
-		}
-		next = parsed
+	if kind != "custom" {
+		return next, nil
 	}
-	return next, nil
+
+	customForm := tui.Form(
+		formInput,
+		out,
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Custom version").
+				Description("Enter the exact version to write. Use x.y.z format.").
+				Placeholder("1.2.3").
+				Validate(func(value string) error {
+					if strings.TrimSpace(value) == "" {
+						return errors.New("custom version is required")
+					}
+					_, err := Parse(value)
+					return err
+				}).
+				Value(&custom),
+		),
+	)
+
+	if err := customForm.Run(); err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return Semver{}, errors.New("version update cancelled")
+		}
+		return Semver{}, err
+	}
+
+	parsed, err := Parse(custom)
+	if err != nil {
+		return Semver{}, err
+	}
+	return parsed, nil
+}
+
+func accessibleInput(in io.Reader) io.Reader {
+	if os.Getenv("TERM") != "dumb" {
+		return in
+	}
+	return &oneByteReader{source: in}
+}
+
+type oneByteReader struct {
+	source io.Reader
+}
+
+func (r *oneByteReader) Read(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+	var b [1]byte
+	n, err := r.source.Read(b[:])
+	if n > 0 {
+		p[0] = b[0]
+		return 1, nil
+	}
+	return 0, err
 }

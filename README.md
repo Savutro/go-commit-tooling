@@ -1,11 +1,10 @@
-![go-commit-tooling banner](docs/assets/banner.svg)
-
-# go-commit-tooling
+## ![go-commit-tooling banner](docs/assets/header-dark.png)
 
 [![Go Release](https://github.com/savutro/go-commit-tooling/actions/workflows/go-release.yml/badge.svg)](https://github.com/savutro/go-commit-tooling/actions/workflows/go-release.yml)
+[![App Version](https://img.shields.io/github/v/tag/savutro/go-commit-tooling?label=app%20version&sort=semver)](https://github.com/savutro/go-commit-tooling/tags)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/savutro/go-commit-tooling)](go.mod)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org/)
-[![License: MIT](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 `gct` is an interactive Go CLI for teams that want Git hygiene without ceremony. It helps you stage files intentionally, write understandable Conventional Commits, generate changelogs, maintain a plain `VERSION` file, and create release commits plus tags for CI/CD.
 
@@ -15,7 +14,6 @@ The main workflow is:
 gct add
 gct commit
 gct release
-git push origin main --follow-tags
 ```
 
 ## Why This Exists
@@ -93,7 +91,7 @@ After previewing the message, `gct` can run `git commit` for you.
 
 ### `gct release`
 
-Creates a release in the local repository.
+Creates a release commit and tag, then publishes both to GitHub by default.
 
 The command:
 
@@ -105,14 +103,21 @@ The command:
 6. Regenerates `CHANGELOG.md`.
 7. Commits those artifacts as `chore(release): vX.Y.Z`.
 8. Creates an annotated `vX.Y.Z` tag.
+9. Pushes the current branch and the new tag to `origin`.
 
-Then publish the release commit and tag:
+Use a different remote when needed:
 
 ```powershell
-git push origin main --follow-tags
+gct release --remote upstream
 ```
 
-The tag is what should trigger release publishing in CI/CD.
+Keep the release local when you want to inspect it before publishing:
+
+```powershell
+gct release --no-push
+```
+
+The tag is what triggers release publishing in CI/CD. The default flow pushes it for you so you do not need to remember `git push origin main --follow-tags`.
 
 ### `gct generate`
 

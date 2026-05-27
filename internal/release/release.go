@@ -21,6 +21,8 @@ type Options struct {
 	Input      io.Reader
 	Output     io.Writer
 	StrictOnly bool
+	Push       bool
+	Remote     string
 }
 
 type analysis struct {
@@ -117,7 +119,24 @@ func Run(opts Options) error {
 	}
 
 	fmt.Fprintf(opts.Output, "Created release commit and tag %s.\n", tag)
+	if opts.Push {
+		branch, err := gitutil.CurrentBranch()
+		if err != nil {
+			return err
+		}
+		if err := gitutil.PushRelease(opts.Remote, branch, tag); err != nil {
+			return err
+		}
+		fmt.Fprintf(opts.Output, "Pushed %s and %s to %s.\n", branch, tag, remoteName(opts.Remote))
+	}
 	return nil
+}
+
+func remoteName(remote string) string {
+	if remote == "" {
+		return "origin"
+	}
+	return remote
 }
 
 func analyze(strictOnly bool) (analysis, error) {

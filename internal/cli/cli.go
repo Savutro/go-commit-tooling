@@ -23,7 +23,7 @@ Usage:
   gct commit              Build and create a conventional git commit
   gct generate [-s]       Generate CHANGELOG.md from git history
   gct version             Create or update VERSION interactively
-  gct release [-s]        Bump VERSION, generate changelog, commit, and tag
+  gct release [-s]        Bump VERSION, changelog, commit, tag, and push
   gct help                Show this help
 `
 
@@ -124,6 +124,8 @@ func runRelease(args []string, stdin io.Reader, stdout io.Writer) error {
 	flags := flag.NewFlagSet("release", flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	strictOnly := flags.Bool("s", false, "only include conventional commits in the changelog")
+	noPush := flags.Bool("no-push", false, "create the release locally without pushing")
+	remote := flags.String("remote", "origin", "git remote to push the release to")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -131,5 +133,7 @@ func runRelease(args []string, stdin io.Reader, stdout io.Writer) error {
 		Input:      stdin,
 		Output:     stdout,
 		StrictOnly: *strictOnly,
+		Push:       !*noPush,
+		Remote:     *remote,
 	})
 }

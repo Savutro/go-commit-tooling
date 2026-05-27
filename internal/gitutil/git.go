@@ -55,9 +55,9 @@ func Log(rangeSpec string) ([]Commit, error) {
 	if rangeSpec != "" {
 		args = append(args, rangeSpec)
 	}
-	out, err := exec.Command("git", args...).Output()
+	out, err := exec.Command("git", args...).CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("git log failed: %w", err)
+		return nil, fmt.Errorf("git log failed: %w\n%s", err, strings.TrimSpace(string(out)))
 	}
 
 	records := bytes.Split(out, []byte{0x1e})
@@ -88,9 +88,9 @@ func SemverTags() ([]Tag, error) {
 		"HEAD",
 		"--sort=creatordate",
 		"--format=%(refname:short)%09%(creatordate:short)",
-	).Output()
+	).CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("git tag failed: %w", err)
+		return nil, fmt.Errorf("git tag failed: %w\n%s", err, strings.TrimSpace(string(out)))
 	}
 
 	var tags []Tag
@@ -187,6 +187,19 @@ func DirtyStatus() (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
+// CurrentBranch returns the checked-out branch name.
+func CurrentBranch() (string, error) {
+	out, err := exec.Command("git", "branch", "--show-current").CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("git branch failed: %w\n%s", err, strings.TrimSpace(string(out)))
+	}
+	branch := strings.TrimSpace(string(out))
+	if branch == "" {
+		return "", fmt.Errorf("cannot push release from detached HEAD")
+	}
+	return branch, nil
+}
+
 // Add stages the given paths.
 func Add(paths ...string) error {
 	if len(paths) == 0 {
@@ -265,6 +278,17 @@ func statusName(status byte) string {
 func AnnotatedTag(name, message string) error {
 	if out, err := exec.Command("git", "tag", "-a", name, "-m", message).CombinedOutput(); err != nil {
 		return fmt.Errorf("git tag failed: %w\n%s", err, strings.TrimSpace(string(out)))
+	}
+	return nil
+}
+
+// PushRelease pushes the release commit branch and tag to the given remote.
+func PushRelease(remote, branch, tag string) error {
+	if remote == "" {
+		remote = "origin"
+	}
+	if out, err := exec.Command("git", "push", remote, branch, tag).CombinedOutput(); err != nil {
+		return fmt.Errorf("git push failed: %w\n%s", err, strings.TrimSpace(string(out)))
 	}
 	return nil
 }
