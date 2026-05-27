@@ -159,20 +159,11 @@ So they are not obsolete, but they should be treated as building blocks. For day
 
 This repository uses the Go release workflow in [.github/workflows/go-release.yml](.github/workflows/go-release.yml).
 
-The recommended policy is:
+The flow:
 
 - Pull requests: test and build only.
 - Pushes to `main`: test and build only.
 - Tags like `v1.2.3`: publish release artifacts.
-
-Reusable workflow templates live in [docs/github-actions](docs/github-actions):
-
-- [Go binary release](docs/github-actions/go-release.yml)
-- [Docker image build](docs/github-actions/docker-image.yml)
-- [Static GitHub Pages](docs/github-actions/static-pages.yml)
-- [Docusaurus GitHub Pages](docs/github-actions/docusaurus-pages.yml)
-
-The templates use official `actions/*` and `docker/*` actions. The Go release workflow uses GitHub's preinstalled `gh` CLI to create releases directly instead of relying on a third-party release action.
 
 ## Project Layout
 
@@ -199,8 +190,6 @@ go vet ./...
 go build -o bin/gct.exe ./cmd/gct
 ```
 
-The TUI uses the alternate screen so arrow-key navigation does not flood the terminal scrollback.
-
 ## License
 
-MIT. See [LICENSE](LICENSE).
+GPLv3. See [LICENSE](LICENSE).
