@@ -1,6 +1,6 @@
 module github.com/savutro/go-commit-tooling
 
-go 1.23.0
+go 1.26.3
 
 require (
 	github.com/charmbracelet/bubbletea v1.3.6
